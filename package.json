@@ -1,0 +1,32 @@
+{
+  "name": "her-runtime",
+  "version": "0.0.1",
+  "description": "her的运行时，包括后端smarty插件和前端js框架",
+  "author": {
+    "name": "huangyi",
+    "email": "ustbhuangyi@gmail.com"
+  },
+  "bugs": {
+    "url": "https://github.com/ustbhuangyi/her-runtime/issues"
+  },
+  "engines": {
+    "node": ">=0.9"
+  },
+  "homepage": "https://github.com/ustbhuangyi/her-runtime/",
+  "keywords": [
+    "her",
+    "runtime",
+    "her-kernel"
+  ],
+  "licenses": "MIT",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:ustbhuangyi/her-runtime.git"
+  },
+  "dependencies": {
+    "del": "^0.1.0",
+    "gulp": "^3.6.0",
+    "gulp-inline-js": "latest"
+  }
+}
