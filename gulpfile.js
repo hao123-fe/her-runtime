@@ -1,6 +1,5 @@
 var gulp = require('gulp');
 var inline = require('gulp-inline-js');
-var dest = 'dist';
 
 var path = {
   libjs: {
