@@ -9,7 +9,7 @@ class BigPipeResource
 {
     private static $map = array(
         "res"=>array(),
-        "tpl"=>array()
+        "her"=>array()
     );
     private static $registedMoudle = array();
     public static $knownResources = array();
