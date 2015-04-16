@@ -231,7 +231,7 @@
 })(window);
 
 ;
-//plugins entrance
+
 (function(global, window, document, undefined) {
     function ajax(url, cb, data) {
   var xhr = new (window.XMLHttpRequest || ActiveXObject)("Microsoft.XMLHTTP");

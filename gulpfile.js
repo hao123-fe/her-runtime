@@ -7,8 +7,8 @@ var path = {
     release: 'dist/javascript'
   },
   libplugin: {
-    src: 'src/plugins/**/*',
-    release: 'dist/plugins'
+    src: 'src/plugin/**/*',
+    release: 'dist/plugin'
   }
 };
 
