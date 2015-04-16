@@ -244,7 +244,8 @@ class BigPipe
 
         // BigPipeResource运行依赖her-map.json, 需要在这里设置config目录的路径
         if (!defined('BIGPIPE_CONF_DIR')) {
-            define('BIGPIPE_CONF_DIR', $smarty->getConfigDir()[0]);
+             $confDir = $smarty->getConfigDir();
+             define('BIGPIPE_CONF_DIR', $confDir[0]);
         }
 
         return true;
