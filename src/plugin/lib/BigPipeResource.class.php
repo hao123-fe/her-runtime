@@ -16,8 +16,8 @@ class BigPipeResource
 
     public static function setupMap($map)
     {
-        self::$map["res"] = array_merge(self::$map["res"], $map["res"]);
-        self::$map["her"] = array_merge(self::$map["her"], $map["her"]);
+        self::$map["res"] = self::$map["res"] + $map["res"];
+        self::$map["her"] = self::$map["her"] + $map["her"];
     }
 
     public static function registModule($name)
