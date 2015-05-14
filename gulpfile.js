@@ -9,6 +9,10 @@ var path = {
   libplugin: {
     src: 'src/plugin/**/*',
     release: 'dist/plugin'
+  },
+  jshelper: {
+    src: 'src/js_helper/**/*',
+    release: 'dist/js_helper'
   }
 };
 
@@ -25,4 +29,11 @@ gulp.task('libplugin:copy', function () {
     .pipe(gulp.dest(path.libplugin.release));
 });
 
-gulp.task('default', ['libjs:compile', 'libplugin:copy']);
+//copy jshelper
+gulp.task('js_helper:copy', function () {
+  return gulp.src(path.jshelper.src)
+    .pipe(gulp.dest(path.jshelper.release));
+});
+
+
+gulp.task('default', ['libjs:compile', 'libplugin:copy', 'js_helper:copy']);
