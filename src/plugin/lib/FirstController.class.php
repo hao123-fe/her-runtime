@@ -24,6 +24,7 @@ class FirstController extends PageController
     private $headInnerHTML = null;
     private $bodyInnerHTML = null;
     private $loadedResource = array();
+    private $pagelets = array(); //定义空数组不报错
 
     protected $sessionId = 0; //此次会话ID,用于自动生成不重复id,第一次默认为0
     protected $uniqIds = array(); //不重复id种子
@@ -291,7 +292,8 @@ class FirstController extends PageController
             echo "\n" . $html;
         }
 
-        echo "\n<script>\"use strict\";\n";
+        echo "\n<script>\n";
+        // echo "\n<script>\"use strict\";\n";
         // 输出函数
         if (!empty($hooks)) {
             foreach ($hooks as $id => $hook) {

@@ -200,7 +200,7 @@ class PageletContext
      * @see addRequire
      * @see addRequireAsync
      */
-    public function addHook($eventType, $scriptCode) // {{{
+    public function addHook($eventType, $scriptCode, $strict) // {{{
     {
         if(isset($this->popTarget) && $this->popTarget == true){
             $target = $this->parent;
@@ -208,7 +208,7 @@ class PageletContext
             $target = $this;
         }
         $event = $target->getEvent($eventType, self::FLG_AUTO_ADD_EVENT);
-        $event->addHook($scriptCode);
+        $event->addHook($scriptCode, $strict);
     } // }}}
     
     /**
