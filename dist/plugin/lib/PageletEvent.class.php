@@ -80,8 +80,11 @@ class PageletEvent // {{{
      * @access public
      * @return void
      */
-    public function addHook($scriptCode)
+    public function addHook($scriptCode, $strict)
     {
+        if($strict){
+            $scriptCode = "'use strict';\n" . $scriptCode;
+        }
         $this->hooks[] = $scriptCode;
     }
 } // }}}

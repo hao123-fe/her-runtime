@@ -198,7 +198,9 @@ class SmartController extends FirstController
                 $pagelets[] = $config;
             }
         }
-        
+
+        // 输出之前 设置 Content-Type: application/json
+        header('Content-Type: application/json;charset=UTF-8');
         echo json_encode($pagelets);
     }
     /**

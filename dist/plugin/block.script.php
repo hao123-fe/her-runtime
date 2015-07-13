@@ -16,6 +16,7 @@ function smarty_block_script($params, $content, $smarty, &$repeat)
 {
     if (!$repeat && isset($content)) {
         $eventType = isset($params['on']) ? $params['on'] : "load";
+        $strict = (isset($params['strict']) && $params['strict'] == false) ? false : true;
         $context   = BigPipe::currentContext();
         
         if (isset($params["sync"])) {
@@ -26,7 +27,7 @@ function smarty_block_script($params, $content, $smarty, &$repeat)
             $context->addRequireAsync($eventType, $params["async"]);
         }
 
-        $context->addHook($eventType, $content);
+        $context->addHook($eventType, $content, $strict);
     }
 }
 

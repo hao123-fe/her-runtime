@@ -1,9 +1,10 @@
 var gulp = require('gulp');
+var del = require('del');
 var inline = require('gulp-inline-js');
 
 var path = {
   libjs: {
-    src: 'src/javascript/**/*',
+    src: 'src/javascript/main.js',
     release: 'dist/javascript'
   },
   libplugin: {
@@ -35,5 +36,9 @@ gulp.task('js_helper:copy', function () {
     .pipe(gulp.dest(path.jshelper.release));
 });
 
+gulp.task('clean', del.bind(null, 'dist/**'));
+gulp.task('compile', ['libjs:compile', 'libplugin:copy', 'js_helper:copy']);
 
-gulp.task('default', ['libjs:compile', 'libplugin:copy', 'js_helper:copy']);
+gulp.task('default', ['clean'], function(){
+  gulp.start('compile');
+});

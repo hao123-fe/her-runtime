@@ -292,7 +292,8 @@ class FirstController extends PageController
             echo "\n" . $html;
         }
 
-        echo "\n<script>\"use strict\";\n";
+        echo "\n<script>\n";
+        // echo "\n<script>\"use strict\";\n";
         // 输出函数
         if (!empty($hooks)) {
             foreach ($hooks as $id => $hook) {
