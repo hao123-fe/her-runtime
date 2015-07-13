@@ -201,7 +201,7 @@ class SmartController extends FirstController
 
         // 输出之前 设置 Content-Type: application/json
         header('Content-Type: application/json;charset=UTF-8');
-        echo trim(json_encode($pagelets));
+        echo json_encode($pagelets);
     }
     /**
      * 按Quickling模式输出一个pagelet
