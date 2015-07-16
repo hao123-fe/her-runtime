@@ -210,7 +210,7 @@ class BigPipe
                $ids = explode(self::$separator, $ids);
                foreach($ids as $id){
                     $id = explode(".", $id);
-                    $sessions[$id[0]] = $id[1];
+                    $sessions[$id[0]] = intval($id[1]);
                }
                $ids = array_keys($sessions);
             }
