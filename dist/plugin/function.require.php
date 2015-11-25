@@ -2,6 +2,7 @@
 /**
  * smarty 模版函数 require
  * 处理 {require} 标签
+ * @author zhangwentao <zhangwentao@baidu.com>
  *
  * @param array $params
  * @param Smarty $smarty

@@ -1,20 +1,14 @@
 <?php
+/**
+ * SmartController 输出控制器，用于处理quickling请求
+ *
+ * @uses PageController
+ * @author zhangwentao <zhangwentao@baidu.com> 
+ */
+
 BigPipe::loadClass("FirstController");
 BigPipe::loadClass("BigPipeResource");
 
-/**
- * 第一次请求页面时的输出控制器
- * 
- *    共分为4个阶段输出:
- *
- *    1.渲染并收集最外层结构(未被pagelet包裹的内容)并收集使用到的Js和CSS  
- *    2.输出html、head、body和最外层结构，并且输出前端库及使用到的CSS和Js资源  
- *    3.根据优先级输出各层结构，并输出依赖资源表  
- *    4.结束  
- *
- * @uses PageController
- * @author Zhang Yuanwei <zhangyuanwei@baidu.com> 
- */
 class SmartController extends FirstController
 {
     const STAT_COLLECT = 1; // 收集阶段
@@ -26,8 +20,8 @@ class SmartController extends FirstController
     //private $pagelets = array();
     private $loadedResource = array();
     
-    protected $sessionId = 0; //此次会话ID,用于自动生成不重复id,第一次默认为0
-    protected $uniqIds = array(); //不重复id种子
+    protected $sessionId = 0; // 此次会话ID,用于自动生成不重复id,第一次默认为0
+    protected $uniqIds = array(); // 不重复id种子
     
     /**
      * 构造函数
@@ -45,29 +39,6 @@ class SmartController extends FirstController
 
         $this->actionChain = array(
             //收集阶段
-            /*'collect_html_open' => array(
-                'outputOpenTag',
-                true
-            ),
-            'collect_head_open' => array(
-                'startCollect',
-                true
-            ),
-            'collect_title_open' => array(
-                'outputOpenTag',
-                //FIXME collect and save title??
-                true
-            ),
-            'collect_title_close' => array(
-                'outputCloseTag'
-            ),
-            'collect_head_close' => array(
-                'collectHeadHTML'
-            ),
-            'collect_body_open' => array(
-                'startCollect',
-                true
-            ),*/
             'collect_pagelet_open' => array(
                 //TODO 'outputPageletOpenTag',
                 'addPagelet',
@@ -80,49 +51,15 @@ class SmartController extends FirstController
                 'setupBigrender',
                 'outputSmartCloseTag'
             ),
-            /*'collect_body_close' => array(
-                'collectBodyHTML'
-            ),
-            //'collect_html_close' => false,
-            */
+
             'collect_more' => array(
                 'changeState',
                 true
             ),
             //输出阶段
-            //'output_html_open' => false,
-            /*'output_head_open' => array(
-                'outputOpenTag',
-                //TODO 'outputNoscriptFallback',
-                'outputHeadHTML',
-                false
-            ),*/
-            //'output_title_open' => false,
-            //'output_title_close' => false,
-            /*'output_head_close' => array(
-                //TODO 'outputLayoutStyle',
-                'outputLayoutStyle',
-                'outputCloseTag'
-            ),
-            'output_body_open' => array(
-                'outputOpenTag',
-                'outputBodyHTML',
-                false
-            ),*/
-            //'output_pagelet_open' => false,
-            //'output_pagelet_close' => false,
             'output_body_close' => array(
-                //'outputBigPipeLibrary',
-                //'outputLoadedResource',
-                //TODO 'sessionStart',
-                //TODO 'outputLayoutPagelet',
-                //'outputLayoutPagelet',
                 'outputPagelets',
-                //'outputCloseTag'
             ),
-            /*'output_html_close' => array(
-                'outputCloseTag'
-            ),*/
             'output_more' => false,
             'default' => false
         );
@@ -151,7 +88,6 @@ class SmartController extends FirstController
         if(in_array($id, $this->ids)){
             $this->pagelets[] = $context;
         }
-        //in_array($pagelet->getParam("id"), $this->ids)
     }
     
     /**
@@ -192,8 +128,6 @@ class SmartController extends FirstController
                 
                 if( isset($this->sessions[$id]) ){
                     $config["session"] = $this->sessions[$id];
-                }else{
-                    //$config["session"] = 0;
                 }
                 $pagelets[] = $config;
             }
@@ -214,12 +148,6 @@ class SmartController extends FirstController
         $hooks = array();
         $config = $this->getPageletConfig($pagelet, $html, $resourceMap, $hooks);
         $config['quickling'] = true;
-
-        if (!empty($hooks)) {
-            foreach ($hooks as $id => $hook) {
-                // echo "BigPipe.hooks[\"$id\"]=function(){{$hook}};\n";
-            }
-        }
         
         //设置资源表 
         if (!empty($resourceMap)) {
@@ -252,18 +180,11 @@ class SmartController extends FirstController
                 $outputMap[$id] = $resource;
                 BigPipeResource::$knownResources[$id] = $resource;
             }
-
-            //echo "BigPipe.setResourceMap(", json_encode($outputMap), ");\n";
         }
         
         $config["resourceMap"] = $outputMap;
         
         return $config;
-        //echo json_encode($config);
-        //输出 pagelet 配置 
-        //echo "BigPipe.onPageletArrive(", json_encode($config), ");\n";
-        //echo "</script>";
-        
     }
 
     /**
@@ -292,13 +213,8 @@ class SmartController extends FirstController
         if (!empty($pagelet->html)) {
             //生成容器ID
             $containerId = $this->sessionUniqId("__cnt_");
-            
-            //生成注释的内容
-            //$html = "<code id=\"$containerId\" style=\"display:none\"><!-- ";
-            //$html = $this->getCommentHTML($pagelet->html);
-            $html = $pagelet->html;
-            //$html .= " --></code>";
-            
+            $html = $pagelet->html;  
+
             //设置html属性
             $config["html"]["container"] = $containerId;
             $config["html"]["html"] = $html;
@@ -309,8 +225,6 @@ class SmartController extends FirstController
 
             if ($event !== false) {
                 foreach ($event->hooks as $hook) {
-                    //$hookId                   = $this->sessionUniqId("__cb_");
-                    //$hooks[$hookId]           = $hook;
                     $config["hooks"][$type][] = $hook;
                 }
                 
@@ -324,6 +238,3 @@ class SmartController extends FirstController
         return $config;
     }    
 }
-
-// vim600: sw=4 ts=4 fdm=marker syn=php
-

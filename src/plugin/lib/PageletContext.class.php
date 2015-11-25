@@ -1,14 +1,15 @@
 <?php
-
-BigPipe::loadClass("PageletEvent");
-
 /**
  * Pagelet 节点上下文
  * 用于保存 Pagelet 的属性
  * 
  * @uses PageletEvent
- * @author Zhang Yuanwei <zhangyuanwei@baidu.com> 
+ * @author ZhangYuanwei <zhangyuanwei@baidu.com> 
+ *         zhangwentao <zhangwentao@baidu.com>
  */
+
+BigPipe::loadClass("PageletEvent");
+
 class PageletContext
 {
     
@@ -106,7 +107,7 @@ class PageletContext
      * @access public
      * @return void
      */
-    public function __construct($type, $params = null) // {{{
+    public function __construct($type, $params = null) 
     {
         $this->type     = $type;
         $this->params   = $params;
@@ -124,7 +125,7 @@ class PageletContext
             $this->popTarget = true;
         }
 
-    } // }}}
+    } 
     
     /**
      * 添加依赖资源 
@@ -139,7 +140,7 @@ class PageletContext
      * $context->addRequire("beforedisplay", "common:css/layout.css");
      * $context->addRequire("load", array("common:js/jquery.js"));
      */
-    public function addRequire($eventType, $resourceName) // {{{
+    public function addRequire($eventType, $resourceName) 
     {
         //var_dump($resourceName);
         if(isset($this->popTarget) && $this->popTarget == true){
@@ -156,7 +157,7 @@ class PageletContext
         } else {
             $event->addRequire($resourceName);
         }
-    } // }}}
+    } 
     
     /**
      * 添加异步依赖资源 
@@ -168,7 +169,7 @@ class PageletContext
      *
      * @see addRequire
      */
-    public function addRequireAsync($eventType, $resourceName) // {{{
+    public function addRequireAsync($eventType, $resourceName) 
     {
         if(isset($this->popTarget) && $this->popTarget == true){
             $target = $this->parent;
@@ -183,7 +184,7 @@ class PageletContext
         } else {
             $event->addRequireAsync($resourceName);
         }
-    } // }}}
+    } 
     
     /**
      * 添加 hook 函数
@@ -200,7 +201,7 @@ class PageletContext
      * @see addRequire
      * @see addRequireAsync
      */
-    public function addHook($eventType, $scriptCode, $strict) // {{{
+    public function addHook($eventType, $scriptCode, $strict) 
     {
         if(isset($this->popTarget) && $this->popTarget == true){
             $target = $this->parent;
@@ -209,7 +210,7 @@ class PageletContext
         }
         $event = $target->getEvent($eventType, self::FLG_AUTO_ADD_EVENT);
         $event->addHook($scriptCode, $strict);
-    } // }}}
+    } 
     
     /**
      * 得到事件对象 
@@ -219,7 +220,7 @@ class PageletContext
      * @access private
      * @return PageletEvent 指定的事件对象
      */
-    public function getEvent($eventType, $flag = self::FLG_NONE) // {{{
+    public function getEvent($eventType, $flag = self::FLG_NONE) 
     {
         if (isset($this->events[$eventType])) {
             return $this->events[$eventType];
@@ -229,7 +230,7 @@ class PageletContext
         } else {
             return false;
         }
-    } // }}}
+    } 
     
     /**
      * 得到参数,如果不存在此参数,则返回默认值
@@ -239,7 +240,7 @@ class PageletContext
      * @access public
      * @return mixed 参数值
      */
-    public function getParam($name, $default = null, $flag = self::FLG_NONE) // {{{
+    public function getParam($name, $default = null, $flag = self::FLG_NONE) 
     {
         if (isset($this->params[$name])) {
             return $this->params[$name];
@@ -247,7 +248,7 @@ class PageletContext
             $this->params[$name] = $default;
         }
         return $default;
-    } // }}}
+    } 
     
     /**
      * 得到标签名 
@@ -255,7 +256,7 @@ class PageletContext
      * @access private
      * @return string 标签名
      */
-    private function getTagName() // {{{
+    private function getTagName() 
     {
         switch ($this->type) {
             case BigPipe::TAG_HTML:
@@ -270,7 +271,7 @@ class PageletContext
                 return $this->getParam("html-tag", "div");
             default:
         }
-    } // }}}
+    } 
     
     /**
      * 得到打开标签的 HTML 
@@ -279,7 +280,7 @@ class PageletContext
      * @access public
      * @return string 标签打开的 HTML
      */
-    public function getOpenHTML($params = null) // {{{
+    public function getOpenHTML($params = null) 
     {
         
         $text = "";
@@ -311,7 +312,7 @@ class PageletContext
         }
         $text .= '>';
         return $text;
-    } // }}}
+    } 
     
     /**
      * 得到闭合标签的HTML 
@@ -319,10 +320,10 @@ class PageletContext
      * @access public
      * @return string 标签闭合的 HTML
      */
-    public function getCloseHTML() // {{{
+    public function getCloseHTML() 
     {
         return '</' . $this->getTagName() . '>';
-    } // }}}
+    } 
     
     private static function getPriorityString($arr)
     {
@@ -385,6 +386,3 @@ class PageletContext
     }
     
 }
-
-// vim600: sw=4 ts=4 fdm=marker syn=php
-

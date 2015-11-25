@@ -1,11 +1,12 @@
 <?php
-
 /**
- * 页面控制器 
+ * 页面控制器 PageController
  * 
  * @abstract
- * @author Zhang Yuanwei <zhangyuanwei@baidu.com> 
+ * @author ZhangYuanwei <zhangyuanwei@baidu.com>
+ *         zhangwentao <zhangwentao@baidu.com>
  */
+
 abstract class PageController
 {
     /**
@@ -51,7 +52,7 @@ abstract class PageController
      * @access private
      * @return bool 函数链的执行结果
      */
-    private function doAction($key, $context) // {{{
+    private function doAction($key, $context) 
     {
         $ret     = null;
         $actions = null;
@@ -79,7 +80,7 @@ abstract class PageController
             }
         }
         return $ret;
-    } // }}}
+    } 
     
     /**
      * 标签打开时调用，控制标签的执行
@@ -89,10 +90,10 @@ abstract class PageController
      * @access public
      * @return bool 当前 Pagelet 是否需要执行
      */
-    public final function openTag($context) // {{{
+    public final function openTag($context) 
     {
         return $this->doAction($this->getActionKey($context->type, self::ACTION_OPEN), $context);
-    } // }}}
+    } 
     
     /**
      * 标签关闭时调用
@@ -102,10 +103,10 @@ abstract class PageController
      * @access public
      * @return void
      */
-    public final function closeTag($context) // {{{
+    public final function closeTag($context) 
     {
         $this->doAction($this->getActionKey($context->type, self::ACTION_CLOSE), $context);
-    } // }}}
+    } 
     
     /**
      * 页面完成一次执行后调用，用于控制页面是否重复执行 
@@ -114,10 +115,10 @@ abstract class PageController
      * @access public
      * @return bool 页面是否重复执行
      */
-    public final function hasMore() // {{{
+    public final function hasMore() 
     {
         return $this->doAction($this->getActionKey(BigPipe::TAG_NONE, self::ACTION_MORE), null);
-    } // }}}
+    } 
     
     /**
      * 输出打开标签
@@ -126,10 +127,10 @@ abstract class PageController
      * @access protected
      * @return void
      */
-    protected function outputOpenTag($context) // {{{
+    protected function outputOpenTag($context) 
     {
         echo $context->getOpenHTML();
-    } // }}}
+    } 
     
     /**
      * 输出闭合标签
@@ -138,10 +139,10 @@ abstract class PageController
      * @access protected
      * @return void
      */
-    protected function outputCloseTag($context) // {{{
+    protected function outputCloseTag($context) 
     {
         echo $context->getCloseHTML();
-    } // }}}
+    } 
     
     /**
      * 开始收集内容
@@ -150,10 +151,10 @@ abstract class PageController
      * @access protected
      * @return void
      */
-    protected function startCollect($context) // {{{
+    protected function startCollect($context) 
     {
         ob_start();
-    } // }}}
+    } 
     
     /**
      * 将收集到的内容作为 pagelet 的 HTML 内容
@@ -162,10 +163,10 @@ abstract class PageController
      * @access protected
      * @return void
      */
-    protected function collectHTML($context) // {{{
+    protected function collectHTML($context) 
     {
         $context->html = ob_get_clean();
-    } // }}}
+    } 
     
     /**
      * collectScript 收集脚本
@@ -174,7 +175,7 @@ abstract class PageController
      * @access protected
      * @return void
      */
-    protected function collectScript($context) // {{{
+    protected function collectScript($context) 
     {
         $context->parent->addScript(
             ob_get_clean(), 
@@ -182,8 +183,6 @@ abstract class PageController
             $context->getBigPipeConfig("deps"), 
             $context->getBigPipeConfig("asyncs")
         );
-    } // }}}
+    } 
     
 }
-
-// vim600: sw=4 ts=4 fdm=marker syn=php

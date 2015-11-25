@@ -3,6 +3,7 @@
  * smarty 编译插件 pagelet
  *
  * 处理 {pagelet} 标签
+ * @author zhangwentao <zhangwentao@baidu.com>
  * 
  * @param array $params
  * @param Smarty $smarty 

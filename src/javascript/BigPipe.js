@@ -1,3 +1,8 @@
+/**
+ * @file Bigpipe提供获取pagelet 处理pagelet和资源的接口
+ * @author zhangwentao(zhangwentao@baidu.com)
+ */
+
 __d("BigPipe", ["Resource", "Requestor", "Controller"], function(global, require, module, exports) {
 
   var Resource = require("Resource");
@@ -47,24 +52,6 @@ __d("BigPipe", ["Resource", "Requestor", "Controller"], function(global, require
       Controller.pageletArrive(conf);
     },
     //TODO
-    /*
-     BigPipe.onPageletArrive({
-     id:"__elm_0_1",
-     html:{
-     container:"__cnt_0_1"
-     },
-     hooks:{
-     load:[ "__cb_0_1" ]
-     },
-     deps:{
-     load:[ "922c5377f9" ],
-     "beforeload",
-     "beforedisplay",
-     "load"
-     }
-     });
-     */
-    //},
     /**
      * 页面调用函数,用于设置资源列表
      *
@@ -103,7 +90,6 @@ __d("BigPipe", ["Resource", "Requestor", "Controller"], function(global, require
     //return Resource.getResourceByName(name);
     //},
     hooks : Controller.hooks,
-    onPageletLoad: function(){},
     fetch : function(pagelets, url){
       Requestor.fetch(pagelets, url);
     }

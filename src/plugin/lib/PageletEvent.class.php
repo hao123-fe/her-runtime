@@ -1,12 +1,13 @@
 <?php
-
 /**
  * Pagelet 事件 
  * 封装 Pagelet 事件的相关属性
  * 
- * @author Zhang Yuanwei <zhangyuanwei@baidu.com> 
+ * @author ZhangYuanwei <zhangyuanwei@baidu.com> 
+ *         zhangwentao <zhangwentao@baidu.com>
  */
-class PageletEvent // {{{
+
+class PageletEvent
 {
     /**
      * 事件的依赖资源 
@@ -87,6 +88,5 @@ class PageletEvent // {{{
         }
         $this->hooks[] = $scriptCode;
     }
-} // }}}
+} 
 
-// vim600: sw=4 ts=4 fdm=marker syn=php

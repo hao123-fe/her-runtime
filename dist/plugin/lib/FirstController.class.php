@@ -1,7 +1,4 @@
 <?php
-BigPipe::loadClass("PageController");
-BigPipe::loadClass("BigPipeResource");
-
 /**
  * 第一次请求页面时的输出控制器
  *
@@ -13,8 +10,13 @@ BigPipe::loadClass("BigPipeResource");
  *    4.结束
  *
  * @uses PageController
- * @author Zhang Yuanwei <zhangyuanwei@baidu.com>
+ * @author ZhangYuanwei <zhangyuanwei@baidu.com>
+ *         zhangwentao <zhangwentao@baidu.com>
  */
+
+BigPipe::loadClass("PageController");
+BigPipe::loadClass("BigPipeResource");
+
 class FirstController extends PageController
 {
     const STAT_COLLECT = 1; // 收集阶段
@@ -244,13 +246,6 @@ class FirstController extends PageController
         foreach ($jsLibs as $resource) {
            echo "<script src=\"{$resource['src']}\"></script>";
         }
-       //echo "<script>var ", BigPipe::$globalVar, "=new (require(\"BigPipe\"))();</script>\n";
-       // echo "<script>BigPipe.init(" . json_encode(array(
-       //     "ajaxKey" => BigPipe::$ajaxKey,
-       //     "sessionKey" => BigPipe::$sessionKey,
-       //     "separator" => BigPipe::$separator,
-       //     "debug" => BigPipe::$debug
-       // )) . ");</script>\n";
     } //
 
     protected function outputLoadedResource($context)
@@ -503,6 +498,3 @@ class FirstController extends PageController
     }
 
 }
-
-// vim600: sw=4 ts=4 fdm=marker syn=php
-

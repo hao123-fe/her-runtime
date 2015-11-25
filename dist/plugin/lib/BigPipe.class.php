@@ -1,16 +1,18 @@
 <?php
+/**
+ * BigPipe 页面运行时框架
+ *
+ * @uses PageletContext
+ * @author ZhangYuanwei <zhangyuanwei@baidu.com>
+ *         zhangwentao <zhangwentao@baidu.com>
+ */
+ 
 if (!defined('BIGPIPE_BASE_DIR')) {
     define('BIGPIPE_BASE_DIR', dirname(__FILE__));
 }
 
 define("BIGPIPE_DEBUG", 0);
 
-/**
- * BigPipe 页面运行时框架
- *
- * @uses PageletContext
- * @author Zhang Yuanwei <zhangyuanwei@baidu.com>
- */
 class BigPipe
 {
     // 标签类型常量
@@ -87,10 +89,10 @@ class BigPipe
      * Quickling 请求时的会话参数，用于保持前后端状态
      */
     protected static $sessionKey = '__session__';
-//    /**
-//     * 前端不支持 Js 时的 fallback 请求参数
-//     */
-//    protected static $nojsKey = '__noscript__';
+   /**
+    * 前端不支持 Js 时的 fallback 请求参数
+    */
+   // protected static $nojsKey = '__noscript__';
     /**
      * 前端 js 框架地址
      */
@@ -114,12 +116,12 @@ class BigPipe
      */
     private static $savedAssertOptions = null;
 
-    public static function getBigrenderCode() // {{{
+    public static function getBigrenderCode() 
     {
         if(self::$bigrenderCode) return self::$bigrenderCode;
 
         return self::$bigrenderCode = "return !require('" . self::$bigrenderLib . "').add(this);";
-    } // }}}
+    } 
 
     /**
      * 得到当前上下文
@@ -133,10 +135,10 @@ class BigPipe
      * $context->addDepend("her:css/layout.css", "beforedisplay");
      * $context->addDepend("her:js/jquery.js", "load");
      */
-    public static function currentContext() // {{{
+    public static function currentContext() 
     {
         return self::$context;
-    } // }}}
+    } 
 
     /**
      * 加载类
@@ -146,7 +148,7 @@ class BigPipe
      * @access public
      * @return bool 是否加载成功
      */
-    public static function loadClass($className) // {{{
+    public static function loadClass($className)
     {
         if (!class_exists($className, false)) {
             $fileName = BIGPIPE_BASE_DIR . DIRECTORY_SEPARATOR . $className . ".class.php";
@@ -155,7 +157,7 @@ class BigPipe
             }
         }
         return class_exists($className, false);
-    } // }}}
+    } 
 
     /**
      * 设置框架的 debug 模式
@@ -165,10 +167,10 @@ class BigPipe
      * @access public
      * @return void
      */
-    public static function setDebug($isDebug) // {{{
+    public static function setDebug($isDebug) 
     {
         self::$debug = !!$isDebug;
-    } // }}}
+    } 
 
     /**
      * 根据请求得到控制器
@@ -182,7 +184,7 @@ class BigPipe
      * @return PageController 适合当前环境的控制器
      * @see init
      */
-    private static function getController() // {{{
+    private static function getController() 
     {
         $get    = self::getSuperGlobal(self::SUPER_TYPE_GET);
         $cookie = self::getSuperGlobal(self::SUPER_TYPE_COOKIE);
@@ -222,7 +224,7 @@ class BigPipe
          */
         self::loadClass("FirstController");
         return new FirstController();
-    } // }}}
+    } 
 
     /**
      * 模板调用函数。用于初始化控制器，
@@ -234,7 +236,7 @@ class BigPipe
      * @return bool 是否初始化成功，固定为 true
      * @see smarty_compiler_html
      */
-    public static final function init($smarty) // {{{
+    public static final function init($smarty)
     {
         self::saveAssertOptions();
         self::setAssertOptions();
@@ -253,7 +255,7 @@ class BigPipe
         }
 
         return true;
-    } // }}}
+    } 
 
     /**
      * 模板调用函数。在标签打开时调用，用于控制标签内部是否执行。
@@ -345,10 +347,10 @@ class BigPipe
      * @return bool 当前标签是否存在
      * @see compileOpenTag
      */
-    public static final function has($uniqid) // {{{
+    public static final function has($uniqid)
     {
         return isset(self::$context->children[$uniqid]);
-    } // }}}
+    } 
 
     /**
      * 模板调用函数。用于控制页面是否需要再次执行。
@@ -361,7 +363,7 @@ class BigPipe
      * @see smarty_compiler_htmlclose
      * @see PageController::hasMore
      */
-    public static final function more() // {{{
+    public static final function more() 
     {
         assert('self::$state === self::STAT_FIRST || self::$state === self::STAT_LOOP');
 
@@ -372,9 +374,8 @@ class BigPipe
             self::$state = self::STAT_END;
             return false;
         }
-    } //}}}
+    } 
 
-    // Smarty 编译辅助函数 {{{
     /**
      * Smarty 编译辅助函数，用于编译一个打开标签
      *
@@ -458,10 +459,6 @@ class BigPipe
         return var_export(uniqid(), true);
     }
 
-    // }}}
-
-    // {{{ 单元测试辅助函数
-
     /**
      * 超全局变量 GET 类型
      */
@@ -498,9 +495,6 @@ class BigPipe
         return null;
     }
 
-    // }}}
-
-    // 调试相关函数 {{{
     /**
      * 保存断言配置
      *
@@ -562,7 +556,6 @@ class BigPipe
             assert_options(ASSERT_ACTIVE, 0);
         }
     }
-    // }}}
 
     public static function array_merge($arr1, $arr2){
         foreach ($arr2 as $key => $value) {
@@ -571,6 +564,3 @@ class BigPipe
         return $arr1;
     }
 }
-
-// vim600: sw=4 ts=4 fdm=marker syn=php
-

@@ -1,3 +1,8 @@
+/**
+ * @file Controller 处理pageletArrive
+ * @author zhangwentao(zhangwentao@baidu.com)
+ */
+
 __d("Controller", ["Pagelet", "Resource"], function (global, require, module, exports) {
 
   var Pagelet = require("Pagelet");
@@ -19,11 +24,7 @@ __d("Controller", ["Pagelet", "Resource"], function (global, require, module, ex
       pagelet =  Pagelet.getPlagelet(conf.id);
 
       if(conf.quickling){
-        //if(this.sessions[conf.id] === undefined) this.sessions[conf.id] = 0;
-        //if(conf.session < this.sessions[conf.id]) return;
-        //conf.html = conf.html.html;
         Resource.setResourceMap(conf.resourceMap);
-        //delete conf.resourceMap;
       }else if(conf.html){
         conf.html = document.getElementById(conf.html.container).firstChild.data;
       }
@@ -39,10 +40,6 @@ __d("Controller", ["Pagelet", "Resource"], function (global, require, module, ex
           }
         }
       }
-
-      pagelet.on("load", function(){
-        //BigPipe.onPageletLoad && BigPipe.onPageletLoad.call(this);
-      });
 
       pagelet.arrive(conf);
     },

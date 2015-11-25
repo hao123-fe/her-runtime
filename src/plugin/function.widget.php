@@ -2,6 +2,7 @@
 /**
  * smarty function widget
  * called by {widget} tag
+ * @author zhangwentao <zhangwentao@baidu.com>
  *
  * @param array $params
  * @param Smarty $template

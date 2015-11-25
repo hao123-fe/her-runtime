@@ -1,3 +1,8 @@
+/**
+ * @file 运行时AMD，提供define require require.defer require.async接口
+ * @author zhangwentao(zhangwentao@baidu.com)
+ */
+
 (function(global){
 
   var isReady = false,
@@ -1445,7 +1450,12 @@ function type(obj) {
 }
 ;
 ;
-    __d("BigPipe", ["Resource", "Requestor", "Controller"], function(global, require, module, exports) {
+    /**
+ * @file Bigpipe提供获取pagelet 处理pagelet和资源的接口
+ * @author zhangwentao(zhangwentao@baidu.com)
+ */
+
+__d("BigPipe", ["Resource", "Requestor", "Controller"], function(global, require, module, exports) {
 
   var Resource = require("Resource");
   var Requestor = require("Requestor");
@@ -1494,24 +1504,6 @@ function type(obj) {
       Controller.pageletArrive(conf);
     },
     //TODO
-    /*
-     BigPipe.onPageletArrive({
-     id:"__elm_0_1",
-     html:{
-     container:"__cnt_0_1"
-     },
-     hooks:{
-     load:[ "__cb_0_1" ]
-     },
-     deps:{
-     load:[ "922c5377f9" ],
-     "beforeload",
-     "beforedisplay",
-     "load"
-     }
-     });
-     */
-    //},
     /**
      * 页面调用函数,用于设置资源列表
      *
@@ -1550,7 +1542,6 @@ function type(obj) {
     //return Resource.getResourceByName(name);
     //},
     hooks : Controller.hooks,
-    onPageletLoad: function(){},
     fetch : function(pagelets, url){
       Requestor.fetch(pagelets, url);
     }
@@ -1560,7 +1551,12 @@ function type(obj) {
 
 });
 ;
-    __d("Controller", ["Pagelet", "Resource"], function (global, require, module, exports) {
+    /**
+ * @file Controller 处理pageletArrive
+ * @author zhangwentao(zhangwentao@baidu.com)
+ */
+
+__d("Controller", ["Pagelet", "Resource"], function (global, require, module, exports) {
 
   var Pagelet = require("Pagelet");
   var Resource = require("Resource");
@@ -1581,11 +1577,7 @@ function type(obj) {
       pagelet =  Pagelet.getPlagelet(conf.id);
 
       if(conf.quickling){
-        //if(this.sessions[conf.id] === undefined) this.sessions[conf.id] = 0;
-        //if(conf.session < this.sessions[conf.id]) return;
-        //conf.html = conf.html.html;
         Resource.setResourceMap(conf.resourceMap);
-        //delete conf.resourceMap;
       }else if(conf.html){
         conf.html = document.getElementById(conf.html.container).firstChild.data;
       }
@@ -1601,10 +1593,6 @@ function type(obj) {
           }
         }
       }
-
-      pagelet.on("load", function(){
-        //BigPipe.onPageletLoad && BigPipe.onPageletLoad.call(this);
-      });
 
       pagelet.arrive(conf);
     },
@@ -2540,7 +2528,12 @@ function type(obj) {
 
 });
 ;
-    __d("Requestor", ["Controller"], function (global, require, module, exports) {
+    /**
+ * @file Requestor 发起quickling请求，管理sessionid和pagelet缓存
+ * @author zhangwentao(zhangwentao@baidu.com)
+ */
+
+__d("Requestor", ["Controller"], function (global, require, module, exports) {
 
   var Controller = require('Controller');
 

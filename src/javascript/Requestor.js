@@ -1,3 +1,8 @@
+/**
+ * @file Requestor 发起quickling请求，管理sessionid和pagelet缓存
+ * @author zhangwentao(zhangwentao@baidu.com)
+ */
+
 __d("Requestor", ["Controller"], function (global, require, module, exports) {
 
   var Controller = require('Controller');

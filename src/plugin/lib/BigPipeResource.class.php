@@ -2,24 +2,47 @@
 /**
  * 资源管理类
  *
- * @author Tobias Schlitt <toby@php.net>
- * @license PHP Version 3.0 {@link http://www.php.net/license/3_0.txt}
+ * @author zhangwentao <zhangwentao@baidu.com>
  */
 class BigPipeResource
 {
+    /**
+     * 存储资源map
+     */
     private static $map = array(
         "res"=>array(),
         "her"=>array()
     );
+    /**
+     * 存储已经注册的module
+     */
     private static $registedMoudle = array();
+    /**
+     * 存储已经处理过返回给前端的Resources
+     */
     public static $knownResources = array();
-
+    /**
+     * 初始化资源map
+     *
+     * @param array $map 类名
+     * @static
+     * @access public
+     * @return void
+     */
     public static function setupMap($map)
     {
         self::$map["res"] = self::$map["res"] + $map["res"];
         self::$map["her"] = self::$map["her"] + $map["her"];
     }
 
+    /**
+     * 注册一个module 将module的map存在$registedMoudle
+     *
+     * @param string $name 标准化资源路径
+     * @static
+     * @access public
+     * @return void
+     */
     public static function registModule($name)
     {
         $intPos = strpos($name, ':');
@@ -34,28 +57,49 @@ class BigPipeResource
 
         if(!in_array($femodule, self::$registedMoudle)){
 
-            $mapPath = $configPath . '/' . $femodule . '-map.json';
+            if(defined("FE_HTTPS") && FE_HTTPS){
+                $femodulefix = $femodule . '-https';
+            }else{
+                $femodulefix = $femodule;
+            }
+            $mapPath = $configPath . '/' . $femodulefix . '-map.json';
             $map     = json_decode(file_get_contents($mapPath), true);
             BigPipeResource::setupMap($map);
             self::$registedMoudle[] = $femodule;
         }
     }
 
+    /**
+     * 通过标准化路径获取tpl资源
+     *
+     * @param string $path 标准化资源路径
+     * @static
+     * @access public
+     * @return resource
+     */
     public static function getTplByPath($path)
     {
         return self::$map["res"][$path];
     }
 
+    /**
+     * 通过标准化路径获取资源
+     *
+     * @param string $path 标准化资源路径
+     * @static
+     * @access public
+     * @return resource
+     */
     public static function getResourceByPath($path, $type = null){
 
         $map = self::$map["her"];
-        $resource = self::getResource($map,$path,$type);
+        $resource = self::getResource($map, $path, $type);
         if($resource)
           return $resource;
         return false;
     }
 
-    public static function getResource($map,$path, $type){
+    public static function getResource($map, $path, $type){
         foreach ($map as $id => $resource) {
             if( (!isset($type) || $type == $resource['type'])
                 && in_array($path, $resource['defines'])){
@@ -68,6 +112,14 @@ class BigPipeResource
         return false;
     }
 
+    /**
+     * 通过路径数组获取资源数组
+     *
+     * @param string $pathArr 标准化资源路径数组
+     * @static
+     * @access public
+     * @return resources 资源数组
+     */
     public static function pathToResource($pathArr, $type = null){
         $resources = array();
 
@@ -80,9 +132,17 @@ class BigPipeResource
         return $resources;
     }
 
+    /**
+     * 通过资源数组获取依赖资源数组
+     *
+     * @param array $resources 资源数组
+     * @param bool $asyncs 是否需要获取async依赖
+     * @static
+     * @access public
+     * @return resources 依赖资源数组
+     */
     public static function getDependResource($resources, $asyncs = true){
         $dependResources = array();
-        //$dependResources = $resources;
 
         $depends = $resources;
 
@@ -106,7 +166,16 @@ class BigPipeResource
 
         return array_reverse($dependResources, true);
     }
-
+    
+    /**
+     * 获取一个资源的依赖
+     *
+     * @param mixed $resource 资源数组
+     * @param bool $asyncs 是否需要获取async依赖
+     * @static
+     * @access public
+     * @return resources 依赖资源数组
+     */
     private static function getDepend($resource, $asyncs){
         $requires = $resource['requires'];
 

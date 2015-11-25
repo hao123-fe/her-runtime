@@ -1,3 +1,8 @@
+/**
+ * @file 运行时AMD，提供define require require.defer require.async接口
+ * @author zhangwentao(zhangwentao@baidu.com)
+ */
+
 (function(global){
 
   var isReady = false,

@@ -2,6 +2,7 @@
 /**
  * smarty 块函数 script
  * 处理 {script} 标签
+ * @author zhangwentao <zhangwentao@baidu.com>
  *
  * @param array $params
  * @param string $content

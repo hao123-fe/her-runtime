@@ -3,6 +3,7 @@
  * smarty 编译插件 body
  *
  * 处理 {body} 标签
+ * @author zhangwentao <zhangwentao@baidu.com>
  * 
  * @param array $params
  * @param Smarty $smarty 
