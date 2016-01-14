@@ -21,10 +21,16 @@ function smarty_block_script($params, $content, $smarty, &$repeat)
         $context   = BigPipe::currentContext();
         
         if (isset($params["sync"])) {
+            foreach ($params["sync"] as $resource) {
+                BigPipeResource::registModule($resource);
+            }
             $context->addRequire($eventType, $params["sync"]);
         }
         
         if (isset($params["async"])) {
+            foreach ($params["async"] as $resource) {
+                BigPipeResource::registModule($resource);
+            }
             $context->addRequireAsync($eventType, $params["async"]);
         }
 
