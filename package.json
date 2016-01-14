@@ -3,16 +3,16 @@
   "version": "0.0.1",
   "description": "her的运行时，包括后端smarty插件和前端js框架",
   "author": {
-    "name": "huangyi",
-    "email": "ustbhuangyi@gmail.com"
+    "name": "hao123-fe",
+    "email": "zhangwentao@baidu.com"
   },
   "bugs": {
-    "url": "https://github.com/ustbhuangyi/her-runtime/issues"
+    "url": "https://github.com/hao123-fe/her-runtime/issues"
   },
   "engines": {
     "node": ">=0.9"
   },
-  "homepage": "https://github.com/ustbhuangyi/her-runtime/",
+  "homepage": "https://github.com/hao123-fe/her-runtime/",
   "keywords": [
     "her",
     "runtime",
@@ -22,7 +22,7 @@
   "main": "index.js",
   "repository": {
     "type": "git",
-    "url": "git@github.com:ustbhuangyi/her-runtime.git"
+    "url": "git@github.com:hao123-fe/her-runtime.git"
   },
   "dependencies": {
     "del": "^0.1.3",
