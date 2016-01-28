@@ -172,8 +172,40 @@ class FirstController extends PageController
         $uri=$_SERVER["REQUEST_URI"];
         $uri=$uri . (strpos($uri, "?")===false ? "?" : "&") . BigPipe::NO_JS . "=1";
 
+        // $_SERVER["REQUEST_URI"] is encoded in some cases, 
+        // decode make sure get the decoded uri
+        $uri = urldecode($uri);
+
+        // parse_url and encode path and query
+        $uri_arr = parse_url($uri);
+        $uri_ret = '';
+
+        if(isset($uri_arr['path'])){
+            $path = $uri_arr['path'];
+            $path_ret = array();
+
+            foreach (explode('/', $path) as $p) {
+                $path_ret[] = urlencode($p);
+            }
+            $path = implode('/', $path_ret);
+            $uri_ret .= $path;
+        }
+
+        if($uri_arr['query']){
+            $query = $uri_arr['query'];
+            $query_ret = array();
+            foreach (explode('&', $query) as $q) {
+                $k_temp = array();
+                foreach (explode('=', $q) as $k) {
+                    $k_temp[] = urlencode($k);
+                }
+                $query_ret[] = implode('=', $k_temp);
+            }
+            $query = implode('&', $query_ret);
+            $uri_ret .= '?' . $query;
+        }
         echo "<noscript>";
-        echo "<meta http-equiv=\"refresh\" content=\"0; URL=$uri\" />";
+        echo "<meta http-equiv=\"refresh\" content=\"0; URL='$uri_ret'\" />";
         echo "</noscript>";
     }
 
