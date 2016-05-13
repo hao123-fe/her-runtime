@@ -77,6 +77,8 @@ class SmartController extends FirstController
             return false;
         }
 
+        $context->renderMode = BigPipe::RENDER_MODE_QUICKLING;
+
         $id = $context->getParam(
             "id", 
             $this->sessionUniqId("__elm_"), 
