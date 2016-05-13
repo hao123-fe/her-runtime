@@ -50,6 +50,7 @@ __d("Requestor", ["Controller"], function (global, require, module, exports) {
 
       function findChild(pagelet) {
         var count;
+        var childObj;
         count = pagelet.children && pagelet.children.length || 0;
 
         cached.push(pagelet);
@@ -57,12 +58,12 @@ __d("Requestor", ["Controller"], function (global, require, module, exports) {
         if (count) {
           for (j = 0; j < count; j++) {
             child = pagelet.children[j];
-            child = cache[child];
+            childObj = cache[child];
 
-            if (!child) {
-              nonCached.push(child.id);
+            if (!childObj) {
+              nonCached.push(child);
             } else {
-              findChild(child);
+              findChild(childObj);
             }
           }
         }

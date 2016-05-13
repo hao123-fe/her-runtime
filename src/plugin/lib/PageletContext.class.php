@@ -303,11 +303,16 @@ class PageletContext
                     $text .= " $key=\"" . htmlspecialchars($value, ENT_QUOTES, 'UTF-8', true) . "\"";
                 }
             }
+            
             foreach ($params as $key => $value) {
                 if(!isset($value)) continue;
                 if (strpos($key, BigPipe::ATTR_PREFIX) !== 0) {
                     $text .= " $key=\"" . htmlspecialchars($value, ENT_QUOTES, 'UTF-8', true) . "\"";
                 }
+            }
+
+            if(!empty($this->renderMode)) {
+                $text .= " data-rm=\"$this->renderMode\"";
             }
         }
         $text .= '>';

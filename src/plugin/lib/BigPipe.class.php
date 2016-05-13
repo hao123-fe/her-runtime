@@ -69,6 +69,10 @@ class BigPipe
      */
     private static $context = null;
     /**
+     *  bodyContext
+     */
+    private static $bodyContext = null;
+    /**
      * 当前状态
      */
     private static $state = self::STAT_UNINIT;
@@ -76,7 +80,31 @@ class BigPipe
     /**
      * 框架使用参数的前缀
      */
-    const ATTR_PREFIX = 'bigpipe-';
+    const ATTR_PREFIX = 'her-';
+    /**
+     * 渲染模式属性名
+     */
+    const RENDER_MODE_KEY = 'her-renderMode';
+    /**
+     * 渲染模式属性名
+     */
+    const CONFIG_KEY = 'her-config';
+    /**
+     * 渲染模式 server, 直接输出html到页面, beforedisplay依赖加入root context
+     */
+    const RENDER_MODE_SERVER = 'server';
+    /**
+     * 渲染模式 lazy, 只输出占位标签
+     */
+    const RENDER_MODE_LAZY = 'lazy';
+    /**
+     * 渲染模式 none, 不输出 直接跳过
+     */
+    const RENDER_MODE_NONE = 'none';
+    /**
+     * 渲染模式 default, 输出html到注释 用js渲染
+     */
+    const RENDER_MODE_DEFAULT = 'default';
     /**
      * 前端不支持 Js 时的 fallback 请求参数
      */
@@ -97,8 +125,7 @@ class BigPipe
      * 前端 js 框架地址
      */
     static $jsLib = null;
-    static $bigrenderLib = null;
-    static $bigrenderCode = null;
+    static $herConf = null;
     /**
      * 前端 js 入口对象名
      */
@@ -116,13 +143,6 @@ class BigPipe
      */
     private static $savedAssertOptions = null;
 
-    public static function getBigrenderCode() 
-    {
-        if(self::$bigrenderCode) return self::$bigrenderCode;
-
-        return self::$bigrenderCode = "return !require('" . self::$bigrenderLib . "').add(this);";
-    } 
-
     /**
      * 得到当前上下文
      *
@@ -138,6 +158,23 @@ class BigPipe
     public static function currentContext() 
     {
         return self::$context;
+    }
+
+    /**
+     * 得到 bodyContext
+     *
+     * @static
+     * @access public
+     * @return PageletContext 当前的上下文
+     * @see PageletContext
+     * @example
+     * $context = BigPipe::bodyContext();
+     * $context->addRequire("beforedisplay", "common:css/layout.css");
+     * $context->addRequire("load", array("common:js/jquery.js"));
+     */
+    public static function bodyContext() 
+    {
+        return self::$bodyContext;
     } 
 
     /**
@@ -212,7 +249,9 @@ class BigPipe
                $ids = explode(self::$separator, $ids);
                foreach($ids as $id){
                     $id = explode(".", $id);
-                    $sessions[$id[0]] = intval($id[1]);
+                    if( isset($id[0]) && isset($id[1]) ) {
+                        $sessions[$id[0]] = intval($id[1]);
+                    }
                }
                $ids = array_keys($sessions);
             }
@@ -250,8 +289,8 @@ class BigPipe
 
         // BigPipeResource运行依赖her-map.json, 需要在这里设置config目录的路径
         if (!defined('BIGPIPE_CONF_DIR')) {
-             $confDir = $smarty->getConfigDir();
-             define('BIGPIPE_CONF_DIR', $confDir[0]);
+            $confDir = $smarty->getConfigDir();
+            define('BIGPIPE_CONF_DIR', $confDir[0]);
         }
 
         return true;
@@ -289,24 +328,57 @@ class BigPipe
                 self::$jsLib = $params['her'];
                 unset($params['her']);
 
-                if(isset($params['bigrender'])){
-                    self::$bigrenderLib = $params['bigrender'];
-                    unset($params['bigrender']);
+                if(isset($params[self::CONFIG_KEY])){
+                    self::$herConf = $params[self::CONFIG_KEY];                    unset($params[self::CONFIG_KEY]);
                 }
             }
-            if(isset($params['bigrender'])){
-                $bigrender = true;
-                unset($params['bigrender']);
-            }
-            $context                          = new PageletContext($type, $params);
-            $context->parent                  = self::$context;
-            self::$context->children[$uniqid] = $context;
+            
+            $context = new PageletContext($type, $params);
 
-            if(isset($bigrender) && $bigrender){
-                $context->bigrender = true;
+            if($type === self::TAG_BODY) {
+                self::$bodyContext = $context;
+            }
+
+            // get context renderMode
+            $renderModeKey = self::RENDER_MODE_KEY;
+            if(isset($params[$renderModeKey])){
+                $context->renderMode = $params[$renderModeKey];
+                unset($params[$renderModeKey]);
+            }
+
+            if(!in_array($context->renderMode, array(
+                self::RENDER_MODE_SERVER,
+                self::RENDER_MODE_LAZY,
+                self::RENDER_MODE_NONE
+            ))) {
+                $context->renderMode = self::RENDER_MODE_DEFAULT;
+            }
+            
+            // if parent context renderMode is RENDER_MODE_NONE, pass to child
+            if( self::$context->renderMode === self::RENDER_MODE_NONE ){
+                $context->renderMode = self::RENDER_MODE_NONE;
+            }
+
+            // if parent context renderMode is RENDER_MODE_LAZY 
+            // and renderMode is not RENDER_MODE_LAZY or RENDER_MODE_NONE 
+            // then set renderMode to RENDER_MODE_LAZY
+            if( self::$context->renderMode === self::RENDER_MODE_LAZY ){
+                if( !in_array($context->renderMode, array(
+                    self::RENDER_MODE_LAZY,
+                    self::RENDER_MODE_NONE
+                )
+                )) {
+                    $context->renderMode = self::RENDER_MODE_LAZY;
+                }
+            }
+
+            $context->parent = self::$context;
+            // 如果 $context 是 RENDER_MODE_NONE, 则不保存到 parent 的 children 里面
+            if($context->renderMode !== self::RENDER_MODE_NONE) {
+                self::$context->children[$uniqid] = $context;
             }
         }
-
+        
         self::$context = $context;
 
         return $context->opened = self::$controller->openTag($context);

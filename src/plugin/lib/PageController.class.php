@@ -60,9 +60,13 @@ abstract class PageController
         if (isset($this->actionChain[$key])) {
             $actions = $this->actionChain[$key];
             if (is_string($actions)) {
-                $actions = array(
+                // $actions = array(
+                //     $actions
+                // );
+                $actions = call_user_func(array(
+                    $this,
                     $actions
-                );
+                ), $context);
             }
             if (is_array($actions)) {
                 foreach ($actions as $method) {
@@ -73,6 +77,10 @@ abstract class PageController
                         ), $context);
                     } else {
                         $ret = $method;
+                    }
+                    // 如果返回 false 直接退出返回
+                    if($ret === false){
+                        break;
                     }
                 }
             } else {

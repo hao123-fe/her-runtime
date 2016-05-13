@@ -27,6 +27,7 @@ class FirstController extends PageController
     private $bodyInnerHTML = null;
     private $loadedResource = array();
     private $pagelets = array(); //定义空数组不报错
+    private $lazyPagelets = array(); 
 
     protected $sessionId = 0; //此次会话ID,用于自动生成不重复id,第一次默认为0
     protected $uniqIds = array(); //不重复id种子
@@ -70,18 +71,23 @@ class FirstController extends PageController
                 'startCollect',
                 true
             ),
-            'collect_pagelet_open' => array(
-                //TODO 'outputPageletOpenTag',
-                'addPagelet',
-                'outputOpenTag',
-                'startCollect',
-                true
-            ),
-            'collect_pagelet_close' => array(
-                'collectHTML',
-                'setupBigrender',
-                'outputCloseTag'
-            ),
+            // 动态 actionChain
+            'collect_pagelet_open' => 'collect_pagelet_open',
+            // 'collect_pagelet_open' => array(
+            //     //TODO 'outputPageletOpenTag',
+            //     'outputOpenTag',
+            //     'addPagelet',
+            //     'startCollect',
+            //     true
+            // ),
+            // 动态 actionChain
+            'collect_pagelet_close' => 'collect_pagelet_close',
+            // 'collect_pagelet_close' => array(
+            //     'collectHTML',
+            //     'setupBigrender',
+            //     'renderPagelet',
+            //     'outputCloseTag'
+            // ),
             'collect_body_close' => array(
                 'collectBodyHTML'
             ),
@@ -118,6 +124,7 @@ class FirstController extends PageController
                 //TODO 'sessionStart',
                 //TODO 'outputLayoutPagelet',
                 'outputLayoutPagelet',
+                'outputLazyPagelets',
                 'outputPagelets',
                 'outputCloseTag'
             ),
@@ -129,6 +136,61 @@ class FirstController extends PageController
         );
     }
 
+    /**
+     * collect_pagelet_open 时的 actionChain
+     *
+     * @param PageletContext $context
+     * @return <Array> actionChain 
+     */
+    protected function collect_pagelet_open($context) {
+        switch($context->renderMode) {
+            case BigPipe::RENDER_MODE_LAZY:
+                $actionChain = array('outputOpenTag');
+                $this->lazyPagelets[] = $context->getParam("id");
+                break;
+            case BigPipe::RENDER_MODE_NONE:
+                $actionChain = false;
+                break;
+            default:
+                $actionChain = array(
+                    'outputOpenTag',
+                    'addPagelet',
+                    'startCollect',
+                    true
+                );
+        }
+        return $actionChain;
+    }
+    /**
+     * collect_pagelet_close 时的 actionChain
+     *
+     * @param PageletContext $context
+     * @return <Array> actionChain 
+     */
+    protected function collect_pagelet_close($context) {
+        switch($context->renderMode) {
+            case BigPipe::RENDER_MODE_LAZY:
+                $actionChain = array('outputCloseTag');
+                break;
+            case BigPipe::RENDER_MODE_NONE:
+                $actionChain = false;
+                break;
+            case BigPipe::RENDER_MODE_SERVER:
+                $actionChain = array(
+                    'collectHTML',
+                    // 'setupBigrender',
+                    'renderPagelet',
+                    'outputCloseTag'
+                );
+                break;
+            default:
+                $actionChain = array(
+                    'collectHTML',
+                    'outputCloseTag'
+                );
+        }
+        return $actionChain;
+    }
     /**
      * 收集阶段调用函数,收集 head 标签中的 HTML 内容
      *
@@ -234,15 +296,41 @@ class FirstController extends PageController
      *
      * @param PageletContext $context
      */
-    protected function setupBigrender($context)
+    // protected function setupBigrender($context)
+    // {
+    //     if(isset($context->bigrender)){
+    //         $eventType = "beforeload";
+    //         $context->addRequire($eventType, BigPipe::$bigrenderLib);
+    //         $context->addHook($eventType, BigPipe::getBigrenderCode());
+    //     }
+    // }
+    /**
+     *  输出 lazy pagelets id 数组
+     *
+     * @param PageletContext $context
+     */
+    protected function outputLazyPagelets()
     {
-        if(isset($context->bigrender)){
-            $eventType = "beforeload";
-            $context->addRequire($eventType, BigPipe::$bigrenderLib);
-            $context->addHook($eventType, BigPipe::getBigrenderCode());
-        }
+        echo "<script>BigPipe.lazyPagelets = " . json_encode($this->lazyPagelets) . ";</script>\n";
     }
+    /**
+     * 渲染 pagelet
+     *
+     * @param PageletContext $context
+     */
+    protected function renderPagelet($context)
+    {
+        $bodyContext = BigPipe::bodyContext();
 
+        $requires = $context->getEvent('beforedisplay')->requires;
+        if(!empty($requires) && $bodyContext) {
+            foreach ($requires as $res) {
+                $bodyContext->addRequire('beforedisplay', $res);
+            }
+        }
+        echo $context->html;
+        unset($context->html);
+    }
     /**
      * 输出布局阶段调用函数,将收集到的 head和body标签中的 HTML 内容输出
      *
@@ -319,15 +407,12 @@ class FirstController extends PageController
             echo "\n" . $html;
         }
 
-        echo "\n<script>\n";
-        // echo "\n<script>\"use strict\";\n";
         // 输出函数
         if (!empty($hooks)) {
             foreach ($hooks as $id => $hook) {
-                echo "BigPipe.hooks[\"$id\"]=function(){{$hook}};\n";
+                echo "<script>BigPipe.hooks[\"$id\"]=function(){{$hook}};</script>\n";
             }
         }
-
         //设置资源表
         if (!empty($resourceMap)) {
             $resourceMap = BigPipeResource::pathToResource($resourceMap);
@@ -360,13 +445,26 @@ class FirstController extends PageController
                 BigPipeResource::$knownResources[$id] = $resource;
             }
 
-            echo "BigPipe.setResourceMap(", json_encode($outputMap), ");\n";
+            echo "<script>BigPipe.setResourceMap(", json_encode($outputMap), ");</script>\n";
         }
 
         //输出 pagelet 配置
-        echo "BigPipe.onPageletArrive(", json_encode($config), ");\n";
-        echo "</script>";
+        echo "<script>BigPipe.onPageletArrive(", json_encode($config), ");</script>\n";
+    }
 
+    private function getPageletHTML($html) {
+        $containerId = $this->sessionUniqId("__cnt_");
+        $ret = "<code id=\"$containerId\" style=\"display:none\"><!-- ";
+        $ret .= $this->getCommentHTML($html);
+        $ret .= " --></code>";
+        return array($ret, $containerId);
+    }
+
+    private function getPageletHooks($hook, &$hooks) {
+        $hookId                   = $this->sessionUniqId("__cb_");
+        $hooks[$hookId]           = $hook;
+        // $config["hooks"][$type][] = $hookId;
+        return $hookId;
     }
 
     /**
@@ -377,11 +475,12 @@ class FirstController extends PageController
      * @param array $resourceMap
      * @param array $hooks
      */
-    private function getPageletConfig($pagelet, &$html, &$resourceMap, &$hooks)
+    protected function getPageletConfig($pagelet, &$html, &$resourceMap, &$hooks, $quickling = false)
     {
         $config      = array();
-
         $config["id"] = $pagelet->getParam("id");
+        $config["children"] = array();
+        $config["renderMode"] = $pagelet->renderMode;
 
         foreach ($pagelet->children as $child) {
             $config["children"][] = $child->getParam("id");
@@ -393,15 +492,15 @@ class FirstController extends PageController
 
         if (!empty($pagelet->html)) {
             //生成容器ID
-            $containerId = $this->sessionUniqId("__cnt_");
-
+            $htmlArr = $this->getPageletHTML($pagelet->html);
             //生成注释的内容
-            $html = "<code id=\"$containerId\" style=\"display:none\"><!-- ";
-            $html .= $this->getCommentHTML($pagelet->html);
-            $html .= " --></code>";
-
+            $html = $htmlArr[0];
             //设置html属性
-            $config["html"]["container"] = $containerId;
+            if($quickling) {
+                $config["html"]["html"] = $pagelet->html;
+            }else{
+                $config["html"]["container"] = $htmlArr[1];
+            }
         }
 
         foreach (self::$knownEvents as $type) {
@@ -409,15 +508,14 @@ class FirstController extends PageController
 
             if ($event !== false) {
                 foreach ($event->hooks as $hook) {
-                    $hookId                   = $this->sessionUniqId("__cb_");
-                    $hooks[$hookId]           = $hook;
-                    $config["hooks"][$type][] = $hookId;
+                    $config["hooks"][$type][] = $quickling 
+                        ? $hook 
+                        : $this->getPageletHooks($hook, $hooks);
                 }
-
                 //deps
                 $requireResources = BigPipeResource::pathToResource($event->requires);
                 $config["deps"][$type] = array_keys($requireResources);
-
+                
                 $resourceMap = array_merge($resourceMap, $event->requires, $event->requireAsyncs);
             }
         }

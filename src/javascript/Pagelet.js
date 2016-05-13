@@ -129,7 +129,7 @@ __d("Pagelet", ["EventEmitter", "Resource"], function (global, require, module, 
            * HTML 内容
            * @member {String|Function}
            */
-          html: config.html || "",
+          html: config.html || null,
           /**
            * 事件依赖的资源ID
            * @member {Object}
@@ -145,6 +145,7 @@ __d("Pagelet", ["EventEmitter", "Resource"], function (global, require, module, 
            * @member {Array}
            */
           children: config.children || [],
+          renderMode: config.renderMode || null,
           /**
            * Pagelet state
            * @member {Number}
@@ -189,7 +190,15 @@ __d("Pagelet", ["EventEmitter", "Resource"], function (global, require, module, 
           return false;
         this.state = STAT_DISPLAYED;
         if (!this.root) {
-          document.getElementById(this.id).innerHTML = this.html;
+          var dom = document.getElementById(this.id);
+          // console.log(this);
+          if(this.html !== null) {
+            dom.innerHTML = this.html;
+          }
+          console.log(this.id, this.renderMode);
+          if(this.renderMode && this.renderMode !== dom.getAttribute('data-rm')) {
+            dom.setAttribute('data-rm', this.renderMode);
+          }
           this.done("display");
         }
         this.callHooks("load");

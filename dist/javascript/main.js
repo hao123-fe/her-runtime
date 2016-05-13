@@ -2384,7 +2384,7 @@ __d("Controller", ["Pagelet", "Resource"], function (global, require, module, ex
            * HTML 内容
            * @member {String|Function}
            */
-          html: config.html || "",
+          html: config.html || null,
           /**
            * 事件依赖的资源ID
            * @member {Object}
@@ -2400,6 +2400,7 @@ __d("Controller", ["Pagelet", "Resource"], function (global, require, module, ex
            * @member {Array}
            */
           children: config.children || [],
+          renderMode: config.renderMode || null,
           /**
            * Pagelet state
            * @member {Number}
@@ -2444,7 +2445,15 @@ __d("Controller", ["Pagelet", "Resource"], function (global, require, module, ex
           return false;
         this.state = STAT_DISPLAYED;
         if (!this.root) {
-          document.getElementById(this.id).innerHTML = this.html;
+          var dom = document.getElementById(this.id);
+          // console.log(this);
+          if(this.html !== null) {
+            dom.innerHTML = this.html;
+          }
+          console.log(this.id, this.renderMode);
+          if(this.renderMode && this.renderMode !== dom.getAttribute('data-rm')) {
+            dom.setAttribute('data-rm', this.renderMode);
+          }
           this.done("display");
         }
         this.callHooks("load");
@@ -2580,6 +2589,7 @@ __d("Requestor", ["Controller"], function (global, require, module, exports) {
 
       function findChild(pagelet) {
         var count;
+        var childObj;
         count = pagelet.children && pagelet.children.length || 0;
 
         cached.push(pagelet);
@@ -2587,12 +2597,12 @@ __d("Requestor", ["Controller"], function (global, require, module, exports) {
         if (count) {
           for (j = 0; j < count; j++) {
             child = pagelet.children[j];
-            child = cache[child];
+            childObj = cache[child];
 
-            if (!child) {
-              nonCached.push(child.id);
+            if (!childObj) {
+              nonCached.push(child);
             } else {
-              findChild(child);
+              findChild(childObj);
             }
           }
         }

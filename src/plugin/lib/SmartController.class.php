@@ -39,19 +39,20 @@ class SmartController extends FirstController
 
         $this->actionChain = array(
             //收集阶段
-            'collect_pagelet_open' => array(
-                //TODO 'outputPageletOpenTag',
-                'addPagelet',
-                'outputSmartOpenTag',
-                'startCollect',
-                true
-            ),
-            'collect_pagelet_close' => array(
-                'collectHTML',
-                'setupBigrender',
-                'outputSmartCloseTag'
-            ),
-
+            'collect_pagelet_open' => 'collect_pagelet_open',
+            'collect_pagelet_close' => 'collect_pagelet_close',
+            // 'collect_pagelet_open' => array(
+            //     //TODO 'outputPageletOpenTag',
+            //     'addPagelet',
+            //     'outputSmartOpenTag',
+            //     'startCollect',
+            //     true
+            // ),
+            // 'collect_pagelet_close' => array(
+            //     'collectHTML',
+            //     // 'setupBigrender',
+            //     'outputSmartCloseTag'
+            // ),
             'collect_more' => array(
                 'changeState',
                 true
@@ -66,52 +67,75 @@ class SmartController extends FirstController
     }
      
     /**
-     * 将当前 pagelet 添加到输出列表中
+     * collect_pagelet_open 时的 actionChain
      *
      * @param PageletContext $context
+     * @return mixed:<Array|false> actionChain 
      */
-    protected function addPagelet($context)
-    {
+    protected function collect_pagelet_open($context) {
+        if($context->renderMode === BigPipe::RENDER_MODE_NONE) {
+            return false;
+        }
+
         $id = $context->getParam(
             "id", 
             $this->sessionUniqId("__elm_"), 
             PageletContext::FLG_APPEND_PARAM
         );
-        //$parentId = $context->parent->
+
         if(isset($context->parent)){
             $parentId = $context->parent->getParam("id");
-            if(in_array($parentId, $this->ids)){
+            if(!empty($parentId) && in_array($parentId, $this->ids)){
                 $this->ids = array_merge($this->ids, array($id));
                 $this->cids[] = $id;
             }
         }
         if(in_array($id, $this->ids)){
             $this->pagelets[] = $context;
+            // var_dump($context->getParam("id"), $this->cids );
+            if( in_array($context->getParam("id"), $this->cids ) ){
+                return array(
+                    'outputOpenTag',
+                    'addPagelet',
+                    'startCollect',
+                    true
+                );
+            }else{
+                return array(
+                    // 'outputOpenTag',
+                    'addPagelet',
+                    'startCollect',
+                    true
+                );
+            }
+        }else{
+            $context->renderMode = BigPipe::RENDER_MODE_NONE;
+            return false;
         }
     }
     
     /**
-     * 输出pagelet开始标签
+     * collect_pagelet_close 时的 actionChain
      *
      * @param PageletContext $context
+     * @return mixed:<Array|false> actionChain 
      */
-    protected function outputSmartOpenTag($context)
-    {
-        if( in_array($context->getParam("id"), $this->cids )) {
-            $this->outputOpenTag($context);
+    protected function collect_pagelet_close($context) {
+        if($context->renderMode === BigPipe::RENDER_MODE_NONE) {
+            return false;
         }
-    }
-    /**
-     * 输出pagelet结束标签
-     *
-     * @param PageletContext $context
-     */
-    protected function outputSmartCloseTag($context)
-    {
-        if( in_array($context->getParam("id"), $this->cids )) {
-            $this->outputCloseTag($context);
+
+        if( in_array($context->getParam("id"), $this->cids ) ){
+            return array(
+                'collectHTML',
+                'outputCloseTag'
+            );
         }
-    }
+
+        return array(
+            'collectHTML',
+        );
+    } 
 
     /**
      * 输出Quickling请求的pagelets
@@ -146,7 +170,7 @@ class SmartController extends FirstController
     {
         $resourceMap = array();
         $hooks = array();
-        $config = $this->getPageletConfig($pagelet, $html, $resourceMap, $hooks);
+        $config = $this->getPageletConfig($pagelet, $html, $resourceMap, $hooks, true);
         $config['quickling'] = true;
         
         //设置资源表 
@@ -185,56 +209,5 @@ class SmartController extends FirstController
         $config["resourceMap"] = $outputMap;
         
         return $config;
-    }
-
-    /**
-     * 得到 pagelet 的配置，用于Quickling输出
-     *
-     * @param PageletContext $pagelet
-     * @param string $html
-     * @param array $resourceMap
-     * @param array $hooks
-     */
-    private function getPageletConfig($pagelet, &$html, &$resourceMap, &$hooks)
-    {
-        $config      = array();
-        
-        $config["id"] = $pagelet->getParam("id");
-        $config["children"] = array();
-
-        foreach ($pagelet->children as $child) {
-            $config["children"][] = $child->getParam("id");
-        }
-
-        if($pagelet->parent) {
-            $config["parent"] = $pagelet->parent->getParam("id");
-        }
-        
-        if (!empty($pagelet->html)) {
-            //生成容器ID
-            $containerId = $this->sessionUniqId("__cnt_");
-            $html = $pagelet->html;  
-
-            //设置html属性
-            $config["html"]["container"] = $containerId;
-            $config["html"]["html"] = $html;
-        }
-                
-        foreach (self::$knownEvents as $type) {
-            $event = $pagelet->getEvent($type);
-
-            if ($event !== false) {
-                foreach ($event->hooks as $hook) {
-                    $config["hooks"][$type][] = $hook;
-                }
-                
-                //deps
-                $requireResources = BigPipeResource::pathToResource($event->requires);
-                $config["deps"][$type] = array_keys($requireResources);
-
-                $resourceMap = array_merge($resourceMap, $event->requires, $event->requireAsyncs);
-            }
-        }
-        return $config;
-    }    
+    } 
 }
