@@ -106,6 +106,10 @@ class BigPipe
      */
     const RENDER_MODE_DEFAULT = 'default';
     /**
+     * 渲染模式 default, 输出html到注释 用js渲染
+     */
+    const RENDER_MODE_QUICKLING = 'quickling';
+    /**
      * 前端不支持 Js 时的 fallback 请求参数
      */
     const NO_JS = '__noscript__-';
@@ -339,39 +343,47 @@ class BigPipe
                 self::$bodyContext = $context;
             }
 
-            // get context renderMode
-            $renderModeKey = self::RENDER_MODE_KEY;
-            if(isset($params[$renderModeKey])){
-                $context->renderMode = $params[$renderModeKey];
-                unset($params[$renderModeKey]);
-            }
+            if($type === self::TAG_PAGELET) {
+                // get context renderMode
+                $renderModeKey = self::RENDER_MODE_KEY;
+                if(isset($params[$renderModeKey])){
+                    $context->renderMode = $params[$renderModeKey];
+                    unset($params[$renderModeKey]);
+                }
 
-            if(!in_array($context->renderMode, array(
-                self::RENDER_MODE_SERVER,
-                self::RENDER_MODE_LAZY,
-                self::RENDER_MODE_NONE
-            ))) {
-                $context->renderMode = self::RENDER_MODE_DEFAULT;
-            }
-            
-            // if parent context renderMode is RENDER_MODE_NONE, pass to child
-            if( self::$context->renderMode === self::RENDER_MODE_NONE ){
-                $context->renderMode = self::RENDER_MODE_NONE;
-            }
-
-            // if parent context renderMode is RENDER_MODE_LAZY 
-            // and renderMode is not RENDER_MODE_LAZY or RENDER_MODE_NONE 
-            // then set renderMode to RENDER_MODE_LAZY
-            if( self::$context->renderMode === self::RENDER_MODE_LAZY ){
-                if( !in_array($context->renderMode, array(
+                if(!in_array($context->renderMode, array(
+                    self::RENDER_MODE_SERVER,
                     self::RENDER_MODE_LAZY,
                     self::RENDER_MODE_NONE
-                )
-                )) {
-                    $context->renderMode = self::RENDER_MODE_LAZY;
+                ))) {
+                    $context->renderMode = self::RENDER_MODE_DEFAULT;
+                }
+
+                // if parent context renderMode is RENDER_MODE_NONE, pass to child
+                if( self::$context->renderMode === self::RENDER_MODE_NONE ){
+                    $context->renderMode = self::RENDER_MODE_NONE;
+                }
+
+                // if parent context renderMode is RENDER_MODE_LAZY 
+                // and renderMode is not RENDER_MODE_LAZY or RENDER_MODE_NONE 
+                // then set renderMode to RENDER_MODE_LAZY
+                if( self::$context->renderMode === self::RENDER_MODE_LAZY ){
+                    if( !in_array($context->renderMode, array(
+                        self::RENDER_MODE_LAZY,
+                        self::RENDER_MODE_NONE
+                    )
+                    )) {
+                        $context->renderMode = self::RENDER_MODE_LAZY;
+                    }
+                }
+
+                if( $context->renderMode === self::RENDER_MODE_SERVER 
+                    && self::$context->renderMode !==  self::RENDER_MODE_SERVER
+                    && self::$context !== self::$bodyContext
+                ) {
+                    $context->renderMode = self::RENDER_MODE_DEFAULT;
                 }
             }
-
             $context->parent = self::$context;
             // 如果 $context 是 RENDER_MODE_NONE, 则不保存到 parent 的 children 里面
             if($context->renderMode !== self::RENDER_MODE_NONE) {
