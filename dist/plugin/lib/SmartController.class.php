@@ -17,7 +17,7 @@ class SmartController extends FirstController
     private $state = self::STAT_COLLECT; //初始状态
     private $headInnerHTML = null;
     private $bodyInnerHTML = null;
-    //private $pagelets = array();
+    
     private $loadedResource = array();
     
     protected $sessionId = 0; // 此次会话ID,用于自动生成不重复id,第一次默认为0
@@ -33,7 +33,8 @@ class SmartController extends FirstController
     {   
         $this->ids = $ids;
         $this->sessions = $sessions;
-        
+
+        $this->pagelets = array();
         $this->cids = array();
         $this->oids = $ids;
 

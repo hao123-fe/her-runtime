@@ -2446,11 +2446,10 @@ __d("Controller", ["Pagelet", "Resource"], function (global, require, module, ex
         if (!this.root) {
           var dom = document.getElementById(this.id);
           // console.log(this);
-          if(this.html !== null) {
+          if(dom && this.html !== null) {
             dom.innerHTML = this.html;
           }
-          console.log(this.id, this.renderMode);
-          if(this.renderMode && this.renderMode !== dom.getAttribute('data-rm')) {
+          if(dom && this.renderMode && this.renderMode !== dom.getAttribute('data-rm')) {
             dom.setAttribute('data-rm', this.renderMode);
           }
           this.done("display");
