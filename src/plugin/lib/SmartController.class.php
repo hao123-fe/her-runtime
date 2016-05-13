@@ -111,7 +111,8 @@ class SmartController extends FirstController
                 );
             }
         }else{
-            $context->renderMode = BigPipe::RENDER_MODE_NONE;
+            // $context->renderMode = BigPipe::RENDER_MODE_NONE;
+            // $context->opened = false;
             return false;
         }
     }
@@ -123,7 +124,9 @@ class SmartController extends FirstController
      * @return mixed:<Array|false> actionChain 
      */
     protected function collect_pagelet_close($context) {
-        if($context->renderMode === BigPipe::RENDER_MODE_NONE) {
+
+        // if($context->renderMode === BigPipe::RENDER_MODE_NONE) {
+        if(!$context->opened) {
             return false;
         }
 

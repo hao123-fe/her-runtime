@@ -119,6 +119,7 @@ class PageletContext
         $this->styles      = array();
         $this->styleLinks  = array();
         
+        $this->renderMode     = BigPipe::RENDER_MODE_DEFAULT;
         $this->vars = array();
 
         if($type == BigPipe::TAG_HEAD || $type == BigPipe::TAG_BODY){
@@ -311,7 +312,7 @@ class PageletContext
                 }
             }
 
-            if(!empty($this->renderMode)) {
+            if(!empty($this->renderMode) && $this->type === BigPipe::TAG_PAGELET) {
                 $text .= " data-rm=\"$this->renderMode\"";
             }
         }

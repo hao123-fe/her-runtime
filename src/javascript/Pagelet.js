@@ -1,8 +1,7 @@
 __d("Pagelet", ["EventEmitter", "Resource"], function (global, require, module, exports) {
 
   var EventEmitter = require("EventEmitter"),
-    Resource = require("Resource");
-
+  Resource = require("Resource");
 
   var EVENT_TYPES = [
     "beforeload"       // Pagelet 开始加载前派发,return false 可以阻止加载

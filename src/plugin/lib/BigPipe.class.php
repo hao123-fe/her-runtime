@@ -358,7 +358,7 @@ class BigPipe
                 ))) {
                     $context->renderMode = self::RENDER_MODE_DEFAULT;
                 }
-
+                
                 // if parent context renderMode is RENDER_MODE_NONE, pass to child
                 if( self::$context->renderMode === self::RENDER_MODE_NONE ){
                     $context->renderMode = self::RENDER_MODE_NONE;
