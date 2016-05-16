@@ -120,11 +120,11 @@ class FirstController extends PageController
             //'output_pagelet_close' => false,
             'output_body_close' => array(
                 'outputBigPipeLibrary',
+                'outputLazyPagelets',
                 'outputLoadedResource',
                 //TODO 'sessionStart',
                 //TODO 'outputLayoutPagelet',
                 'outputLayoutPagelet',
-                'outputLazyPagelets',
                 'outputPagelets',
                 'outputCloseTag'
             ),
@@ -311,7 +311,7 @@ class FirstController extends PageController
      */
     protected function outputLazyPagelets()
     {
-        echo "<script>BigPipe.lazyPagelets = " . json_encode($this->lazyPagelets) . ";</script>\n";
+        echo "\n<script>BigPipe.lazyPagelets = " . json_encode($this->lazyPagelets) . ";</script>";
     }
     /**
      * 渲染 pagelet
@@ -322,10 +322,12 @@ class FirstController extends PageController
     {
         $bodyContext = BigPipe::bodyContext();
 
-        $requires = $context->getEvent('beforedisplay')->requires;
-        if(!empty($requires) && $bodyContext) {
-            foreach ($requires as $res) {
-                $bodyContext->addRequire('beforedisplay', $res);
+        if($context->getEvent('beforedisplay') !== false) {
+            $requires = $context->getEvent('beforedisplay')->requires;
+            if(!empty($requires) && $bodyContext) {
+                foreach ($requires as $res) {
+                    $bodyContext->addRequire('beforedisplay', $res);
+                }
             }
         }
         echo $context->html;

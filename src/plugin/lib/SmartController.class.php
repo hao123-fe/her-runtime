@@ -178,7 +178,7 @@ class SmartController extends FirstController
         $hooks = array();
         $config = $this->getPageletConfig($pagelet, $html, $resourceMap, $hooks, true);
         $config['quickling'] = true;
-        
+        $outputMap = array();        
         //设置资源表 
         if (!empty($resourceMap)) {
             $resourceMap = BigPipeResource::pathToResource($resourceMap);
@@ -186,7 +186,6 @@ class SmartController extends FirstController
 
             $resourceMap = BigPipe::array_merge($resourceMap, $this->loadedResource);
 
-            $outputMap = array();
             foreach ($resourceMap as $id => $resource) {
                 
                 if(isset(BigPipeResource::$knownResources[$id])){
