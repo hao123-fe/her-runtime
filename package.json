@@ -1,28 +1,32 @@
 {
   "name": "her-runtime",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "her的运行时，包括后端smarty插件和前端js框架",
+  "keywords": [
+    "herJS",
+    "fis",
+    "bigpipe",
+    "quickling",
+    "bigrender",
+    "lazyrender",
+    "pagelet",
+    "high-performence rendering"
+  ],
+  "homepage": "https://hao123-fe.github.io/her",
+  "bugs": {
+    "url": "https://github.com/hao123-fe/her/issues"
+  },
   "author": {
     "name": "hao123-fe",
     "email": "zhangwentao@baidu.com"
   },
-  "bugs": {
-    "url": "https://github.com/hao123-fe/her-runtime/issues"
-  },
   "engines": {
     "node": ">=0.9"
   },
-  "homepage": "https://github.com/hao123-fe/her-runtime/",
-  "keywords": [
-    "her",
-    "runtime",
-    "her-kernel"
-  ],
   "licenses": "MIT",
-  "main": "index.js",
   "repository": {
     "type": "git",
-    "url": "git@github.com:hao123-fe/her-runtime.git"
+    "url": "https://github.com/hao123-fe/her-runtime.git"
   },
   "dependencies": {
     "del": "^0.1.3",
