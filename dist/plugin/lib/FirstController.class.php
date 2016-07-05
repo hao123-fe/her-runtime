@@ -351,7 +351,15 @@ class FirstController extends PageController
             $this->loadedResource = BigPipe::array_merge($styleResources, $this->loadedResource);
 
             foreach ($styleResources as $resource) {
-                echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"{$resource['src']}\" />";
+                if (isset(BigPipe::$herConf) 
+                    && isset(BigPipe::$herConf['inlineCSS']) 
+                    && BigPipe::$herConf['inlineCSS']
+                    && isset($resource['content'])
+                ) {
+                    echo "<style>{$resource['content']}</style>";
+                } else {
+                    echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"{$resource['src']}\" />";
+                }
             }
         }
 
@@ -443,6 +451,9 @@ class FirstController extends PageController
 
                 unset($resource['defines']);
                 unset($resource['id']);
+                if(isset($resource['content'])) {
+                    unset($resource['content']);
+                }
                 $outputMap[$id] = $resource;
                 BigPipeResource::$knownResources[$id] = $resource;
             }

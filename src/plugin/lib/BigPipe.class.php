@@ -333,7 +333,8 @@ class BigPipe
                 unset($params['her']);
 
                 if(isset($params[self::CONFIG_KEY])){
-                    self::$herConf = $params[self::CONFIG_KEY];                    unset($params[self::CONFIG_KEY]);
+                    self::$herConf = $params[self::CONFIG_KEY];
+                    unset($params[self::CONFIG_KEY]);
                 }
             }
             
